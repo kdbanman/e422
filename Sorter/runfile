@@ -1,0 +1,1 @@
+/jdk/bin/java -Djava.library.path=. -classpath build/classes sorter.Sorter
