@@ -7,7 +7,8 @@ package sorter;
 public class InsertionSorter {
     
     static {
-        System.loadLibrary("libinsertionsort");
+        // It's *insane* that this works, but loadLibrary("libinsertionsort") doesn't
+        System.load(System.getProperty("java.library.path") + "/libinsertionsort.so");
     }
     
     public native int[] insertionsort(int[] inarr);

@@ -13,22 +13,34 @@ JNIEXPORT jintArray JNICALL Java_sorter_InsertionSorter_insertionsort
         return NULL;
     }
 
-    /* sort array in place with insertion sort */
+    /* sort array in place with insertion sort.
+     * adapted from http://tinyurl.com/m2dv5zv */
     const jsize len = (*env)->GetArrayLength(env, inarr);
     int i, j, temp;
 
     for (i = 1; i < len; i++) {
+
         temp = (int) tosort[i];
         j = i - 1;
+
         while ((temp < (int) tosort[j]) && (j >= 0)) {
+
             tosort[j+1] = tosort[j];
             j--;
         }
+
         tosort[j+1] = (jint) temp;
     }
 
-    /* copy back the array */
+    /* copy tosort to a returnable jintArray */
+    jintArray outarr = (*env)->NewIntArray(env, len);
+    if (outarr == NULL) {
+        printf("Could not create output array.\n");
+        return NULL;
+    }
+
+    (*env)->SetIntArrayRegion(env, outarr, 0, len, tosort);
     (*env)->ReleaseIntArrayElements(env, inarr, tosort, 0);
 
-    return tosort;
+    return outarr;
 }

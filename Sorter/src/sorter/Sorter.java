@@ -31,14 +31,18 @@ public class Sorter {
      */
     public static void main(String[] args) {
         
+     
         int[] testarr = { 
     100, 2, 300,
     4, 5, 600, 
     700, 8, 900, 900
 };
-        System.out.println(testarr);
         InsertionSorter is = new InsertionSorter();
-        System.out.println(is.insertionsort(testarr));
+        int[] out = is.insertionsort(testarr);
+        
+        for (int i : out) {
+            System.out.println(i);
+        }
         
         // Get configuration from command line arguments.
         try {
