@@ -1,0 +1,38 @@
+EXAMPLE USAGE:
+
+cd Generator
+java -jar Generator.jar ../Sorter/nums.txt 1000
+
+cd ../Sorter
+make insertionsort.h
+make
+make ARGS="nums.txt out.txt 0.01 0.02 1000" run
+
+NOTES:
+
+InterfaceException, LocalException, and FailureExceptions are all thrown, and
+all are visible on terminal output when they occur.  LocalException does *not*
+terminate the program, the others do.  FailureException is considered root
+level, and is not within a catch block (i.e. it is thrown by main()).
+
+A simulated hardware failure and a failure to properly sort are treated
+identically, as both are detected by the adjudicator's acceptance test, and both
+result in thrown LocalExceptions.
+
+A watchdog interrept is also a LocalException thrower.
+
+I took the fail probability generator spec very literally.
+    - There are far more variable accesses in the heapsort, so it has a much
+      higher overall probability of failure given the same input probability
+    - For a relatively high probability of either variant failing, run with
+        - Primary failure probability: 0.0003
+        - Backup failure probability: 0.01
+
+The IntSorter as an abstract class may seem like overkill, but it seemed like
+such a perfect candidate for extensibility :)
+
+When the thread running the native method is interrepted by the Watchdog's
+stop() call, the JVM registers the interrept and the program semantics are
+maintained, but the native code finishes sorting before the interrupt is 
+completely handled.  This is only noticeable when sorting large arrays.  I could
+not find a way to kill the native code from Java.
