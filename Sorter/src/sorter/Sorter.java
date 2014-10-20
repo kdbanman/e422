@@ -33,12 +33,25 @@ public class Sorter {
         
      
         int[] testarr = { 
-    100, 2, 300,
-    4, 5, 600, 
-    700, 8, 900, 900
-};
+            100, 2, 300,
+            4, 5, 600, 
+            700, 8, 900, 900
+        };
+        HeapSorter hs = new HeapSorter();
+        int[] out = hs.heapsort(testarr);
+        
+        for (int i : out) {
+            System.out.println(i);
+        }
+        
+        int[] testarr2 = { 
+            100, 2, 300,
+            4, 5, 600, 
+            700, 8, 900, 900
+        };
+        
         InsertionSorter is = new InsertionSorter();
-        int[] out = is.insertionsort(testarr);
+        out = is.insertionsort(testarr2);
         
         for (int i : out) {
             System.out.println(i);
@@ -48,8 +61,8 @@ public class Sorter {
         try {
             SorterConfig config = new SorterConfig(args);
         } catch (IllegalArgumentException e) {
-            System.err.println(e.getMessage());
             usage();
+            System.err.println(e.getMessage());
             System.exit(1);
         }
     }
