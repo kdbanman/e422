@@ -58,22 +58,18 @@ public class Sorter {
                 // Test results
                 if (Adjudicator.resultsAcceptable(var.getResults())) {
                     // Use valid results
-                    writeResults(var.getResults(), config.getOutFile());
+                    FileUtil.writeResults(var.getResults(), config.getOutFile());
                     return true;
                 }
                 // Throw LocalException because test was not passed
                 throw new LocalException("WARN: Variant results unacceptable.");
                 
             // Catch watchdog timer
-            } catch (InterruptedException e) {
+            } catch (ThreadDeath e) {
+                throw new LocalException("WARN: Variant timed out.");
+            }catch (InterruptedException e) {
                 throw new LocalException("WARN: Variant timed out.");
             }
-    }
-    
-    public static void writeResults(int[] outArr, String dest) {
-        for (int i = 0; i < outArr.length; i++) {
-            System.out.println(outArr[i]);
-        }
     }
     
     /**
@@ -92,13 +88,7 @@ public class Sorter {
         }
         
         // Read array from input file
-        int[] inputArray = { 
-            100, 2, 300, 4, 5, 600, 100, 2, 300, 4, 5, 600, 100, 2, 300,
-            4, 5, 600, 
-            100, 2, 300,
-            4, 5, 600, 
-            700, 8, 900, 900
-        };
+        int[] inputArray = FileUtil.readInputArray(config.getInFile());
        
         // Initialize variants
         Variant[] variants = new Variant[2];
@@ -117,7 +107,8 @@ public class Sorter {
                 if (success) break;
             } catch (LocalException e) {
                 System.err.println(e.getMessage());
-                System.err.println("Execution continuing...");
+                System.err.println("Variant " + (i+1) + " failed.");
+                System.err.println("Execution continuing...\n");
             }
         }
         
