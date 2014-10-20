@@ -1,4 +1,4 @@
-JAVA=/usr/java/jdk1.7.0_25
+JAVA=/usr/lib/jvm/java-1.7.0-openjdk-1.7.0.65.x86_64
 HERE= $(shell pwd)
 
 libinsertionsort.so: src/insertionsort.c src/insertionsort.h
