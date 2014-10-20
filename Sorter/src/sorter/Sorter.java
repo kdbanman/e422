@@ -1,5 +1,7 @@
 package sorter;
 
+import java.util.Timer;
+
 /**
  * This is the entry point to the program, and serves as the variant executor.
  * The other major threads are the Watchdog timer and the (currently running) 
@@ -32,6 +34,49 @@ public class Sorter {
     }
     
     /**
+     * Dispatches a Variant to a new, Watchdog-supervised thread. Returns true
+     * on success.
+     * 
+     * @param var Variant to be dispatched.
+     * @param config program configuration
+     * @return true on success
+     * @throws LocalException all failure conditions throw LocalException
+     */
+    public static boolean dispatch(Variant var, SorterConfig config) throws LocalException {
+        
+            // Supervise variant with Watchdog timer
+            Timer scheduler = new Timer();
+            Watchdog wdog = new Watchdog(var);
+            scheduler.schedule(wdog, config.getTimer());
+            
+            var.start();
+            
+            try {
+                // Wait for results
+                var.join();
+                scheduler.cancel();
+                // Test results
+                if (Adjudicator.resultsAcceptable(var.getResults())) {
+                    // Use valid results
+                    writeResults(var.getResults(), config.getOutFile());
+                    return true;
+                }
+                // Throw LocalException because test was not passed
+                throw new LocalException("WARN: Variant results unacceptable.");
+                
+            // Catch watchdog timer
+            } catch (InterruptedException e) {
+                throw new LocalException("WARN: Variant timed out.");
+            }
+    }
+    
+    public static void writeResults(int[] outArr, String dest) {
+        for (int i = 0; i < outArr.length; i++) {
+            System.out.println(outArr[i]);
+        }
+    }
+    
+    /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws FailureException {
@@ -47,53 +92,40 @@ public class Sorter {
         }
         
         // Read array from input file
+        int[] inputArray = { 
+            100, 2, 300, 4, 5, 600, 100, 2, 300, 4, 5, 600, 100, 2, 300,
+            4, 5, 600, 
+            100, 2, 300,
+            4, 5, 600, 
+            700, 8, 900, 900
+        };
+       
+        // Initialize variants
+        Variant[] variants = new Variant[2];
         
-        boolean success = false;
+        IntSorter primary = new HeapSorter(config.getPrimaryFail());
+        variants[0] = new Variant(inputArray, primary);
+        
+        IntSorter backup = new InsertionSorter(config.getBackupFail());
+        variants[1] = new Variant(inputArray, backup);
+        
         // Dispatch variants
-        
-            // Supervise variant with Watchdog timer
-        
-            // Execute adjudicator
-            // if (adj.acceptable(results))
-        
-                // Call success if acceptance test passes
-                // success(results);
-                // success = true;
-        
-                // Throw LocalException if test is not passed
-        
-            // Catch watchdog timer 
-                //Throw LocalException
-        
-        if (!success) {
-            throw new FailureException("ERROR: Variants exhausted without success.");
-        }
-                
-     
-        int[] testarr = { 
-            100, 2, 300,
-            4, 5, 600, 
-            700, 8, 900, 900
-        };
-        IntSorter s = new HeapSorter(config.getPrimaryFail());
-        int[] out = s.sort(testarr);
-        
-        for (int i : out) {
-            System.out.println(i);
+        boolean success = false;
+        for (int i = 0; i < variants.length; i++) {
+            try {
+                success = dispatch(variants[i], config);
+                if (success) break;
+            } catch (LocalException e) {
+                System.err.println(e.getMessage());
+                System.err.println("Execution continuing...");
+            }
         }
         
-        int[] testarr2 = { 
-            100, 2, 300,
-            4, 5, 600, 
-            700, 8, 900, 900
-        };
-        
-        s = new InsertionSorter(config.getBackupFail());
-        out = s.sort(testarr2);
-        
-        for (int i : out) {
-            System.out.println(i);
+        if (success)  {
+            System.out.println("Variant success encountered.");
+            System.out.println("Output written to " + config.getOutFile());
+        } else {
+            throw new FailureException("ERR: Variants exhausted. No success.");
         }
-        
     }
 }

@@ -5,8 +5,8 @@ package sorter;
  * @author kdbanman
  */
 public class Variant extends Thread {
-    int[] inputArray;
-    IntSorter sorter;
+    private int[] inputArray;
+    private IntSorter sorter;
     
     private int[] results;
     
@@ -15,7 +15,6 @@ public class Variant extends Thread {
         this.sorter = sorter;
         
         results = null;
-        
     }
     
     @Override

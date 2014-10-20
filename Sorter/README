@@ -1,0 +1,18 @@
+InterfaceException, LocalException, and FailureExceptions are all thrown, and
+all are visible on terminal output when they occur.  LocalException does *not*
+terminate the program, the others do.  FailureException is considered root
+level, and is not within a catch block (i.e. it is thrown by main()).
+
+A simulated hardware failure and a failure to properly sort are treated
+identically, as both are detected by the adjudicator's acceptance test, and both
+result in thrown LocalExceptions.
+
+I took the fail probability generator spec very literally.
+    - There are far more variable accesses in the heapsort, so it has a much
+      higher overall probability of failure given the same input probability
+    - For a relatively high probability of either variant failing, run with
+        - Primary failure probability: 0.0003
+        - Backup failure probability: 0.01
+
+The IntSorter as an abstract class may seem like overkill, but it seemed like
+such a perfect candidate for extensibility :)
