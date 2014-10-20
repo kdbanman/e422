@@ -17,8 +17,8 @@ public class SorterConfig {
     private float backupfail;
     private int timer;
     
-    private void fail(String msg) throws IllegalArgumentException {
-        throw new IllegalArgumentException("ERROR: " + msg);
+    private void fail(String msg) throws InterfaceException {
+        throw new InterfaceException("ERROR: " + msg);
     }
     
     /**
@@ -26,7 +26,7 @@ public class SorterConfig {
      * @param args standard CLI args array
      * @throws IllegalArgumentException on parse error
      */
-    public SorterConfig(String[] args) throws IllegalArgumentException {
+    public SorterConfig(String[] args) throws InterfaceException {
         if (args.length != 5) fail("5 arguments required.");
         
         if (!Files.isReadable(FileSystems.getDefault().getPath(args[0])))

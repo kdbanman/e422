@@ -4,7 +4,8 @@ package sorter;
  *
  * @author kdbanman
  */
-public class InsertionSorter {
+public class InsertionSorter extends IntSorter {
+    private float failProb;
     
     static {
         // It's *insane* that this works, but 
@@ -13,5 +14,15 @@ public class InsertionSorter {
                     "/libinsertionsort.so");
     }
     
-    public native int[] insertionsort(int[] inarr);
+    public InsertionSorter(float failureProb) {
+        super(failureProb);
+        failProb = failureProb;
+    }
+    
+    @Override
+    public int[] sort(int[] inarr) {
+        return nativesort(inarr, failProb);
+    }
+    
+    private native int[] nativesort(int[] inarr, float failprob);
 }

@@ -9,11 +9,11 @@ extern "C" {
 #endif
 /*
  * Class:     sorter_InsertionSorter
- * Method:    insertionsort
- * Signature: ([I)[I
+ * Method:    nativesort
+ * Signature: ([IF)[I
  */
-JNIEXPORT jintArray JNICALL Java_sorter_InsertionSorter_insertionsort
-  (JNIEnv *, jobject, jintArray);
+JNIEXPORT jintArray JNICALL Java_sorter_InsertionSorter_nativesort
+  (JNIEnv *, jobject, jintArray, jfloat);
 
 #ifdef __cplusplus
 }

@@ -1,7 +1,12 @@
 package sorter;
 
 /**
- *
+ * This is the entry point to the program, and serves as the variant executor.
+ * The other major threads are the Watchdog timer and the (currently running) 
+ * Variant.
+ * 
+ * See the README for notes and assumptions.
+ * 
  * @author kdbanman
  */
 public class Sorter {
@@ -10,7 +15,7 @@ public class Sorter {
      * Prints CLI usage to stderr.
      */
     public static void usage() {
-        // Get executable names
+        // Get executable name
         String name = new java.io.File(Sorter.class.getProtectionDomain()
                                         .getCodeSource()
                                         .getLocation()
@@ -29,16 +34,49 @@ public class Sorter {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FailureException {
         
+        // Get configuration from command line arguments.
+        SorterConfig config = null;
+        try {
+            config = new SorterConfig(args);
+        } catch (InterfaceException e) {
+            usage();
+            System.err.println(e.getMessage());
+            System.exit(1);
+        }
+        
+        // Read array from input file
+        
+        boolean success = false;
+        // Dispatch variants
+        
+            // Supervise variant with Watchdog timer
+        
+            // Execute adjudicator
+            // if (adj.acceptable(results))
+        
+                // Call success if acceptance test passes
+                // success(results);
+                // success = true;
+        
+                // Throw LocalException if test is not passed
+        
+            // Catch watchdog timer 
+                //Throw LocalException
+        
+        if (!success) {
+            throw new FailureException("ERROR: Variants exhausted without success.");
+        }
+                
      
         int[] testarr = { 
             100, 2, 300,
             4, 5, 600, 
             700, 8, 900, 900
         };
-        HeapSorter hs = new HeapSorter();
-        int[] out = hs.heapsort(testarr);
+        IntSorter s = new HeapSorter(config.getPrimaryFail());
+        int[] out = s.sort(testarr);
         
         for (int i : out) {
             System.out.println(i);
@@ -50,20 +88,12 @@ public class Sorter {
             700, 8, 900, 900
         };
         
-        InsertionSorter is = new InsertionSorter();
-        out = is.insertionsort(testarr2);
+        s = new InsertionSorter(config.getBackupFail());
+        out = s.sort(testarr2);
         
         for (int i : out) {
             System.out.println(i);
         }
         
-        // Get configuration from command line arguments.
-        try {
-            SorterConfig config = new SorterConfig(args);
-        } catch (IllegalArgumentException e) {
-            usage();
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
     }
 }
