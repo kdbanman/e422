@@ -4,15 +4,24 @@ Server Sequence:
 - delegate to new client service thread
     - read line as user id
     - look for user
+        - for each known user
+            - decrypt sent user id with key
+            - compare for match with known id
     - if not found
         - send "access-denied"
         - close socket
     - else if found
         - send "access-granted"
         - read line
-        - while line is not finished
+        - while line is not equal to "finished"
             - check for line as file in dir
             - if not found
-                - TODO
+                - send file-not-found
+                - continue while
             - else if found
-                - TOdO
+                - send file-exists
+                - read file into string
+                - encrypt string
+                - send ciphertext
+                - continue while
+        - close socket
