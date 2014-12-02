@@ -6,40 +6,47 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 
 /**
  *
  * @author kdbanman
  */
-public class EncServer extends Thread {
+public class EncServer {
 
+    private ArrayList<User> users;
     private ServerSocket serverSocket;
    
-   public EncServer(int port) throws IOException
-   {
-      serverSocket = new ServerSocket(port);
-      serverSocket.setSoTimeout(10000);
+   public EncServer() throws IOException {
+       users = new ArrayList<>();
+       
+       users.add(new User("test"));
+       users.add(new User("kirby"));
+       users.add(new User("scott"));
+       
+       serverSocket = new ServerSocket(16000);
    }
 
-   public void run()
-   {
+   public void run() {
       while(true)
       {
          try
          {
-            System.out.println("Waiting for client on port " +
-            serverSocket.getLocalPort() + "...");
-            Socket server = serverSocket.accept();
+            System.out.println("Waiting for client on port 16000...");
+            Socket cSock = serverSocket.accept();
             System.out.println("Just connected to "
-                  + server.getRemoteSocketAddress());
+                  + cSock.getRemoteSocketAddress());
+            
             DataInputStream in =
-                  new DataInputStream(server.getInputStream());
+                  new DataInputStream(cSock.getInputStream());
             System.out.println(in.readUTF());
+            
             DataOutputStream out =
-                 new DataOutputStream(server.getOutputStream());
+                 new DataOutputStream(cSock.getOutputStream());
             out.writeUTF("Thank you for connecting to "
-              + server.getLocalSocketAddress() + "\nGoodbye!");
-            server.close();
+              + cSock.getLocalSocketAddress() + "\nGoodbye!");
+            
+            cSock.close();
          }catch(SocketTimeoutException s)
          {
             System.out.println("Socket timed out!");
@@ -53,11 +60,9 @@ public class EncServer extends Thread {
    }
    public static void main(String [] args)
    {
-      int port = Integer.parseInt(args[0]);
       try
       {
-         Thread t = new EncServer(port);
-         t.start();
+         EncServer server = new EncServer();
       }catch(IOException e)
       {
          e.printStackTrace();
