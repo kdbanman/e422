@@ -1,1 +1,18 @@
-SOCKETS AREFOR FUCKERNS
+Server Sequence:
+
+- accept client socket
+- delegate to new client service thread
+    - read line as user id
+    - look for user
+    - if not found
+        - send "access-denied"
+        - close socket
+    - else if found
+        - send "access-granted"
+        - read line
+        - while line is not finished
+            - check for line as file in dir
+            - if not found
+                - TODO
+            - else if found
+                - TOdO
