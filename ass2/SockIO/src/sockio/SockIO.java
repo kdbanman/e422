@@ -17,16 +17,16 @@ import java.nio.ByteBuffer;
  */
 public class SockIO {
     private Socket sock;
-    private byte[] key;
+    private InputStream is;
+    private OutputStream os;
     
-    public SockIO(Socket client, byte[] encKey) {
+    public SockIO(Socket client) throws IOException {
         sock = client;
-        key = encKey;
+        is = sock.getInputStream();
+        os = sock.getOutputStream();
     }
     
     public byte[] recv() throws IOException {
-        InputStream is = sock.getInputStream();
-        
         System.out.println("Reading length header...");
         byte[] lenBuf = new byte[4];
         int read = 0;
@@ -41,34 +41,24 @@ public class SockIO {
         is.read(msg, 0, len);
         System.out.println("Done");
         
-        //TODO decrypt here
-        System.out.println(new String(msg));
+        System.out.println("Received: " + new String(msg));
         
         return msg;
     }
     
     public void send(byte[] bytes) throws IOException {
-        OutputStream os = null;
-        try {
-            os = sock.getOutputStream();
-            
-            System.out.println("Sending length header...");
-            byte[] len = ByteBuffer.allocate(4).putInt(bytes.length).array();
-            os.write(len, 0, len.length);
-            os.flush();
-            System.out.println("Done.");
-            
-            //TODO encrypt here
-            
-            System.out.println("Sending " + Integer.toString(bytes.length) + " byte payload...");
-            os.write(bytes, 0, bytes.length);
-            os.flush();
-            System.out.println("Done.");
-        } finally {
-            if (os != null) {
-                os.close();
-            }
-        }
+        System.out.println("Sending length header...");
+        byte[] len = ByteBuffer.allocate(4).putInt(bytes.length).array();
+        os.write(len, 0, len.length);
+        os.flush();
+        System.out.println("Done.");
+
+        System.out.println("Sending " + Integer.toString(bytes.length) + " byte payload...");
+        os.write(bytes, 0, bytes.length);
+        os.flush();
+        System.out.println("Done.");
+
+        System.out.println("Sent ");
     }
     
     public void sendFile(String fname) throws IOException {
@@ -85,6 +75,9 @@ public class SockIO {
         } finally {
             if (bis != null) {
                 bis.close();
+            }
+            if (fis != null) {
+                fis.close();
             }
         }
     }
