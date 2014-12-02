@@ -1,8 +1,9 @@
 package encserver;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import sockio.SockIO;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -14,58 +15,46 @@ import java.util.ArrayList;
  */
 public class EncServer {
 
-    private ArrayList<User> users;
-    private ServerSocket serverSocket;
-   
-   public EncServer() throws IOException {
-       users = new ArrayList<>();
-       
-       users.add(new User("test"));
-       users.add(new User("kirby"));
-       users.add(new User("scott"));
-       
-       serverSocket = new ServerSocket(16000);
-   }
+    public static void main(String[] args) {
 
-   public void run() {
-      while(true)
-      {
-         try
-         {
-            System.out.println("Waiting for client on port 16000...");
-            Socket cSock = serverSocket.accept();
-            System.out.println("Just connected to "
-                  + cSock.getRemoteSocketAddress());
-            
-            DataInputStream in =
-                  new DataInputStream(cSock.getInputStream());
-            System.out.println(in.readUTF());
-            
-            DataOutputStream out =
-                 new DataOutputStream(cSock.getOutputStream());
-            out.writeUTF("Thank you for connecting to "
-              + cSock.getLocalSocketAddress() + "\nGoodbye!");
-            
-            cSock.close();
-         }catch(SocketTimeoutException s)
-         {
-            System.out.println("Socket timed out!");
-            break;
-         }catch(IOException e)
-         {
+        ArrayList<User> users;
+        ServerSocket serverSocket;
+     
+        int port = 16000;
+
+        // add hardcoded users and keys
+        users = new ArrayList<>();
+
+        users.add(new User("test", "testtest"));
+        users.add(new User("kirby", "kirbybanman"));
+        users.add(new User("scott", "0123456789012345678901234567890123456789"));
+
+        try {
+            // bind to socket
+            serverSocket = new ServerSocket(port);
+            //while (true) {
+                try {
+                    System.out.println("Waiting for client on port 16000...");
+                    Socket cSock = serverSocket.accept();
+                    System.out.println("Connected to " + cSock.getRemoteSocketAddress());
+                    
+                    SockIO sockio = new SockIO(cSock);
+                    sockio.send("asshole".getBytes());
+                    
+                    System.out.println(new String(sockio.recv()));
+
+                    cSock.close();
+                } catch (SocketTimeoutException s) {
+                    System.out.println("Socket timed out!");
+                    //break;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    //break;
+                }
+            //}
+        } catch (IOException e) {
+            System.out.println("Could not bind to port 16000!");
             e.printStackTrace();
-            break;
-         }
-      }
-   }
-   public static void main(String [] args)
-   {
-      try
-      {
-         EncServer server = new EncServer();
-      }catch(IOException e)
-      {
-         e.printStackTrace();
-      }
-   }
+        }
+    }
 }

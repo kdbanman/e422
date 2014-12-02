@@ -14,12 +14,13 @@ public class User {
      * Key is generated from username, because this is a toy and I don't care.
      * @param name 
      */
-    public User(String name) {
-        key = new byte[keyLength];
+    public User(String name, String key) {
+        this.key = new byte[keyLength];
         
-        byte[] nameBytes = name.getBytes();
-        for (int i = 0; i < keyLength && i < nameBytes.length; i++) {
-            key[i] = nameBytes[i];
+        byte[] keyBytes = key.getBytes();
+        
+        for (int i = 0; i < keyLength && i < key.length(); i++) {
+            this.key[i] = keyBytes[i];
         }
     }
 }
