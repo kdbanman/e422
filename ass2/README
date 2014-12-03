@@ -1,3 +1,9 @@
+TODO:
+
+- pad to mod 8 == 0, min 2 longs
+- skeletalize decrypt
+- toss in encrypt and decrypt
+
 Server Sequence:
 
 - accept client socket
@@ -15,8 +21,8 @@ Server Sequence:
         - read line
         - while line is not equal to "finished"
             - check for line as file in dir
-            - if not found
-                - send file-not-found
+            - if not found, or no permissions
+                - send not-found
                 - continue while
             - else if found
                 - send file-exists
