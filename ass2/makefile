@@ -1,16 +1,26 @@
-ANT= ant -Dplatforms.JDK_1.7.home=$(JAVA_HOME) -f build-lab.xml
+JAVA_HOME=/usr/lib/jvm/java-1.7.0
+JCC=$(JAVA_HOME)/bin/javac -d build -cp lib src/*/*.java
+JAVA=$(JAVA_HOME)/bin/java -cp lib:build
 
 sockio:
-	cd SockIO && $(ANT) clean jar && cd ..
+	-mkdir SockIO/build
+	-mkdir SockIO/lib
+	cd SockIO && $(JCC)
+	-mkdir EncServer/lib
+	-mkdir EncClient/lib
+	rsync -a SockIO/build/* EncServer/lib/
+	rsync -a SockIO/build/* EncClient/lib/
 
 server: sockio
-	cd EncServer && $(ANT) clean jar && cd ..
+	-mkdir EncServer/build
+	cd EncServer && $(JCC)
 
 client: sockio
-	cd EncClient && $(ANT) clean jar && cd ..
+	-mkdir EncClient/build
+	cd EncClient && $(JCC)
 
 run_c: client
-	cd EncClient && $(ANT) run && cd ..
+	cd EncClient && $(JAVA) encclient.EncClient
 
 run_s: server
-	cd EncServer && $(ANT) run && cd ..
+	cd EncServer && $(JAVA) encserver.EncServer
