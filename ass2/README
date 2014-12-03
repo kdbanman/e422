@@ -21,7 +21,27 @@ Server Sequence:
             - else if found
                 - send file-exists
                 - read file into string
-                - encrypt string
+                - encrypt string bytes
                 - send ciphertext
                 - continue while
         - close socket
+
+Client Sequence:
+
+- connect to server socket
+- until the server sends "access-granted"
+    - prompt user for id and passkey
+    - encrypt the id with the passkey
+    - send the cipher to the server
+- until the user inputs "finished"
+    - prompt user for filepath (break loop if "finished")
+    - encrypt file path
+    - send cipher to server
+    - if server responds with file ack
+        - report ack
+        - receive file
+        - save file
+    - else if server responds with file nack
+        - report nack
+- send "finished" to server
+- close socket
