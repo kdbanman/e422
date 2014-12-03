@@ -71,10 +71,11 @@ public class EncClient {
             // get file path request or finished command
             System.out.print("File path (or \"finished\")?  ");
             String path = userIn.readLine().trim();
-            if (path.equalsIgnoreCase("finished")) break;
             
             // send request to server
             sio.send(path, key);
+            
+            if (path.equalsIgnoreCase("finished")) break;
             
             System.out.println("Awaiting server response...");
             byte[] response = sio.recv(key);

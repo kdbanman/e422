@@ -20,7 +20,7 @@ public class Decryptor {
         
         // find rightmost nonpad value
         int rBound = intermediate.length - 1;
-        while (intermediate[rBound] == pad) rBound--;
+        while (rBound >= 0 && intermediate[rBound] == pad) rBound--;
         
         // create array excluding the pad
         byte[] plain = new byte[rBound + 1];

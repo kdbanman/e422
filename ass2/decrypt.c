@@ -32,8 +32,7 @@ JNIEXPORT jbyteArray JNICALL Java_sockio_Decryptor_decNative
     b_cip_len = (*env)->GetArrayLength(env, cipher);
     b_key_len = (*env)->GetArrayLength(env, jkey);
 
-    if (NULL == b_cip     || NULL == b_key
-    ||  NULL == b_cip_len || NULL == b_key_len) {
+    if (NULL == b_cip     || NULL == b_key) {
         printf("Could not get local copies of arrays in JNI.\n");
         return NULL;
     }
@@ -53,8 +52,6 @@ JNIEXPORT jbyteArray JNICALL Java_sockio_Decryptor_decNative
 
     cip_len = b_cip_len / sizeof (long);
     key_len = b_key_len / sizeof (long);
-
-    printf("DEBUG %d --> %d, %d --> %d\n", b_cip_len, cip_len, b_key_len, key_len);
 
     // decrypt the long * cip
     int i;

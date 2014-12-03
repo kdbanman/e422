@@ -3,13 +3,10 @@ package encserver;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Files;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.file.LinkOption;
 import java.util.ArrayList;
 import sockio.Decryptor;
-import sockio.Encryptor;
 import sockio.SockIO;
 
 /**
@@ -33,7 +30,7 @@ public class ClientService extends Thread {
     public void run() {
         try {
             sio = new SockIO(sock);
-            System.out.println("Connected to " + sock.getRemoteSocketAddress());
+            log("Connected to " + sock.getRemoteSocketAddress());
 
             // block user until valid encrypted username given
             authenticate();
@@ -41,9 +38,12 @@ public class ClientService extends Thread {
             // service file requests from client until "finished"
             getFiles();
             
+            log("Client is finished.");
             sock.close();
+            this.interrupt();
         } catch (IOException ex) {
-            System.err.println("Socket Stream I/O Error.");
+            ex.printStackTrace();
+            log("Socket Stream I/O Error.");
         }
     }
     
@@ -51,7 +51,7 @@ public class ClientService extends Thread {
         // receive messages until valid encrypted username received
         boolean auth = false;
         while (!auth) {
-            System.out.println("Waiting for user auth...");
+            log("Waiting for user auth...");
             byte[] nameCipher = sio.recv();
             
             // check each user name using that user's key
@@ -62,14 +62,14 @@ public class ClientService extends Thread {
                     // grant access if username match found
                     auth = true;
                     user = u;
-                    System.out.println("Access granted to " + user.name);
+                    log("Access granted to " + user.name);
                     sio.send("access-granted", user.key);
                     break;
                 }
             }
             if (!auth) {
                 // deny access if username not found
-                System.out.println("Unathorized access attempt.");
+                log("Unathorized access attempt.");
                 sio.send("access-denied");
             }
         }
@@ -78,9 +78,9 @@ public class ClientService extends Thread {
     private void getFiles() throws IOException {
         String request = "";
         while (true) {
-            System.out.println("Waiting for file path request...");
+            log("Waiting for file path request...");
             // get client request
-            request = sio.recvString();
+            request = sio.recvString(user.key);
 
             // detect if client is done requesting files
             if (request.equalsIgnoreCase("finished")) return;
@@ -89,6 +89,7 @@ public class ClientService extends Thread {
             // process directory
             if (request.contains("..") || request.startsWith("/")) {
                 sio.send("not-found", user.key);
+                log("Could not send " + request);
                 continue;
             }
 
@@ -96,6 +97,7 @@ public class ClientService extends Thread {
             File f = new File(request);
             if (!(f.exists() && !f.isDirectory()  && f.canRead())) {
                 sio.send("not-found", user.key);
+                log("Could not send " + request);
                 continue;
             }
 
@@ -130,5 +132,9 @@ public class ClientService extends Thread {
                 fis.close();
             }
         }
+    }
+    
+    private void log(String s) {
+        System.out.println(sock.getLocalSocketAddress() + ":  " + s);
     }
 }

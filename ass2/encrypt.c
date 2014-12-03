@@ -50,8 +50,7 @@ JNIEXPORT jbyteArray JNICALL Java_sockio_Encryptor_encNative
     b_msg_len = (*env)->GetArrayLength(env, plain);
     b_key_len = (*env)->GetArrayLength(env, jkey);
 
-    if (NULL == b_msg     || NULL == b_key
-    ||  NULL == b_msg_len || NULL == b_key_len) {
+    if (NULL == b_msg     || NULL == b_key) {
         printf("Could not get local copies of arrays in JNI.\n");
         return NULL;
     }
@@ -71,8 +70,6 @@ JNIEXPORT jbyteArray JNICALL Java_sockio_Encryptor_encNative
 
     msg_len = b_msg_len / sizeof (long);
     key_len = b_key_len / sizeof (long);
-
-    printf("DEBUG %d --> %d, %d --> %d\n", b_msg_len, msg_len, b_key_len, key_len);
 
     // encrypt the long * msg
     int i;
