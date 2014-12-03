@@ -12,4 +12,7 @@
 /ass2/EncServer/build/
 /ass2/EncClient/build/
 /ass2/SockIO/build/
+/ass2/EncServer/lib/
+/ass2/EncClient/lib/
+/ass2/SockIO/lib/
 
