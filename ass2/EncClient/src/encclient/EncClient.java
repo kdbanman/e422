@@ -1,6 +1,8 @@
 package encclient;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import sockio.SockIO;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,6 +18,10 @@ public class EncClient {
     static int keyLength;
     static byte[] key;
     
+    static BufferedReader getUserIn() {
+        return new BufferedReader(new InputStreamReader(System.in));
+    }
+    
     static byte[] getKey(String keyStr) {
         byte[] key = new byte[keyLength];
         
@@ -30,7 +36,7 @@ public class EncClient {
     
     static void authenticate(SockIO sio) throws IOException {
         // allow user input from stdin
-        BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader userIn = getUserIn();
 
         String id = null;
         String keyStr = null;
@@ -48,7 +54,7 @@ public class EncClient {
             sio.send(cipher);
             System.out.println("Sent.");
             
-            response = sio.recvString();
+            response = sio.recvString(getKey(keyStr));
             
         }
         System.out.println("Authenticated.");
@@ -57,6 +63,46 @@ public class EncClient {
         key = getKey(keyStr);
     }
 
+    static void getFiles(SockIO sio) throws IOException {
+        BufferedReader userIn = getUserIn();
+        
+        // while the user is not "finished"
+        while (true) {
+            // get file path request or finished command
+            System.out.print("File path (or \"finished\")?  ");
+            String path = userIn.readLine().trim();
+            if (path.equalsIgnoreCase("finished")) break;
+            
+            // send request to server
+            sio.send(path, key);
+            
+            System.out.println("Awaiting server response...");
+            byte[] response = sio.recv(key);
+            
+            if (new String(response).equalsIgnoreCase("not-found")) {
+                System.out.println("Server could not send file.");
+            } else {
+                System.out.println("Server sending file...");
+                saveFile(sio, path);
+            }
+        }
+    }
+    
+    static void saveFile(SockIO sio, String path) throws IOException {
+        // set up output streams to save file
+        FileOutputStream fos = new FileOutputStream(path);
+        BufferedOutputStream bos = new BufferedOutputStream(fos);
+        
+        // receive file from server
+        byte[] fileBytes = sio.recv(key);
+        
+        // save file to output stream
+        bos.write(fileBytes, 0, fileBytes.length);
+        bos.flush();
+        fos.close();
+        bos.close();
+    }
+    
     public static void main(String[] args) {
         keyLength = 32;
         name = null;
@@ -72,6 +118,9 @@ public class EncClient {
             
             // block user until server authenticates
             authenticate(sio);
+            
+            // get and save files from server using stdin
+            getFiles(sio);
             
             sock.close();
         } catch (IOException e) {

@@ -1,6 +1,6 @@
 JAVA_HOME=/usr/lib/jvm/java-1.7.0
 JCC=$(JAVA_HOME)/bin/javac -d build -cp lib src/*/*.java
-JAVA=$(JAVA_HOME)/bin/java -cp lib:build
+JAVA=$(JAVA_HOME)/bin/java -Djava.library.path=$(shell pwd) -cp lib:build
 JAVAH=$(JAVA_HOME)/bin/javah
 JNI=gcc -fPIC -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 
@@ -23,15 +23,19 @@ decrypt: sockio
 
 libencrypt: encrypt
 	$(JNI) -o libencrypt.so -shared encrypt.c
+	cp libencrypt.so EncServer/lib/
+	cp libencrypt.so EncClient/lib/
 
 libdecrypt: decrypt
 	$(JNI) -o libdecrypt.so -shared decrypt.c
+	cp libdecrypt.so EncServer/lib/
+	cp libdecrypt.so EncClient/lib/
 
-server: sockio
+server: sockio libencrypt libdecrypt
 	-mkdir EncServer/build
 	cd EncServer && $(JCC)
 
-client: sockio
+client: sockio libencrypt libdecrypt
 	-mkdir EncClient/build
 	cd EncClient && $(JCC)
 

@@ -9,5 +9,8 @@ public class Encryptor {
         return plain.getBytes();
     }
     
-    public static native byte[] encNative(byte[] plain, byte[] key);
+    static { System.load(System.getProperty("java.library.path") +
+                                    "/libencrypt.so"); }
+    
+    public static native byte[] enc(byte[] plain, byte[] key);
 }

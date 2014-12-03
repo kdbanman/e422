@@ -1,3 +1,12 @@
+#include <jni.h>
+#include "decrypt.h"
+
+JNIEXPORT jbyteArray JNICALL Java_sockio_Decryptor_dec
+  (JNIEnv * env, jobject obj, jbyteArray cipher, jbyteArray key)
+{
+    
+}
+
 void decrypt (long *v, long *k){
 /* TEA decryption routine */
 unsigned long n=32, sum, y=v[0], z=v[1];
