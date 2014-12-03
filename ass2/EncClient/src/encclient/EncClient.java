@@ -95,6 +95,7 @@ public class EncClient {
             } else {
                 System.out.println("Server sending file...");
                 saveFile(sio, path);
+                System.out.println("File saved to \"" + path + "\"");
             }
         }
     }

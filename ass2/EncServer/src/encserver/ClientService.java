@@ -62,7 +62,7 @@ public class ClientService extends Thread {
                     // grant access if username match found
                     auth = true;
                     user = u;
-                    log("Access granted to " + user.name);
+                    log("Access granted to user \"" + user.name + "\"");
                     sio.send("access-granted", user.key);
                     break;
                 }
@@ -89,7 +89,7 @@ public class ClientService extends Thread {
             // process directory
             if (request.contains("..") || request.startsWith("/")) {
                 sio.send("not-found", user.key);
-                log("Could not send " + request);
+                log("Could not send file \"" + request + "\"");
                 continue;
             }
 
@@ -97,7 +97,7 @@ public class ClientService extends Thread {
             File f = new File(request);
             if (!(f.exists() && !f.isDirectory()  && f.canRead())) {
                 sio.send("not-found", user.key);
-                log("Could not send " + request);
+                log("Could not send file \"" + request + "\"");
                 continue;
             }
 
@@ -105,6 +105,8 @@ public class ClientService extends Thread {
             sio.send("found", user.key);
             
             sendFile(f);
+            
+            log("File sent");
         }
     }
     
@@ -112,6 +114,8 @@ public class ClientService extends Thread {
         FileInputStream fis = null;
         BufferedInputStream bis = null;
         try {
+            log("Reading file...");
+            
             // prepare buffer
             byte[] fileBytes = new byte[(int) file.length()];
             
@@ -121,6 +125,8 @@ public class ClientService extends Thread {
             
             // read file into buffer
             bis.read(fileBytes, 0, fileBytes.length);
+            
+            log("Sending file...");
             
             // send file
             sio.send(fileBytes, user.key);
