@@ -40,3 +40,9 @@ run_c: client
 
 run_s: server
 	cd EncServer && $(JAVA) encserver.EncServer
+
+clean:
+	rm -rf */build
+	rm -rf */dist
+	rm -rf */lib
+	rm *.so *.h
