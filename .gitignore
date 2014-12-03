@@ -1,3 +1,15 @@
-/Sorter/nbproject/private/
+/Sorter/
+/ass1/Sorter/dist/
+/ass1/Sorter/lib/
+/ass1/Sorter/nbproject/
+
 /ass2/EncClient/nbproject/private/
 /ass2/EncServer/nbproject/private/
+/ass2/SockIO/nbproject/private/
+/ass2/EncServer/dist/
+/ass2/EncClient/dist/
+/ass2/SockIO/dist/
+/ass2/EncServer/build/
+/ass2/EncClient/build/
+/ass2/SockIO/build/
+
