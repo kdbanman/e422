@@ -16,3 +16,7 @@
 /ass2/EncClient/lib/
 /ass2/SockIO/lib/
 
+*.so
+*.pdf
+*.h
+*.swp
