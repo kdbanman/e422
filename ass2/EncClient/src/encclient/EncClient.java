@@ -7,6 +7,7 @@ import sockio.SockIO;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import sockio.Decryptor;
 import sockio.Encryptor;
 
 /**
@@ -48,13 +49,22 @@ public class EncClient {
             System.out.print("Passkey?  ");
             keyStr = userIn.readLine().trim().toLowerCase();
 
+            // encrypt the id with the entered passkey
             byte[] cipher = Encryptor.enc(id, getKey(keyStr));
             
-            System.out.println("Sending " + new String(cipher) + "...");
+            // send the passkey
             sio.send(cipher);
-            System.out.println("Sent.");
             
-            response = sio.recvString(getKey(keyStr));
+            // receive the response in plaintext and check if access was denied
+            byte[] responseBytes = sio.recv();
+            response = new String(responseBytes);
+            if (response.equalsIgnoreCase("access-denied")) {
+                System.out.println("Unauthorized ID or Passkey.");
+                continue;
+            } 
+            
+            // access was not denied in plaintext, so decrypt the response
+            response = Decryptor.decString(responseBytes, getKey(keyStr));
             
         }
         System.out.println("Authenticated.");

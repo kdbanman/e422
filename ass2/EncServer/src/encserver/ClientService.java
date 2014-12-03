@@ -135,6 +135,6 @@ public class ClientService extends Thread {
     }
     
     private void log(String s) {
-        System.out.println(sock.getLocalSocketAddress() + ":  " + s);
+        System.out.println(sock.getRemoteSocketAddress() + ":  " + s);
     }
 }

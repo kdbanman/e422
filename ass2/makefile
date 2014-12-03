@@ -1,6 +1,7 @@
 JAVA_HOME=/usr/lib/jvm/java-1.7.0
 JCC=$(JAVA_HOME)/bin/javac -d build -cp lib src/*/*.java
 JAVA=$(JAVA_HOME)/bin/java -Djava.library.path=$(shell pwd) -cp lib:build
+DEBUG=$(JAVA) -Dsockio.debug=true
 JAVAH=$(JAVA_HOME)/bin/javah
 JNI=gcc -fPIC -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 
@@ -44,6 +45,12 @@ run_c: client
 
 run_s: server
 	cd EncServer && $(JAVA) encserver.EncServer
+
+debug_c: client
+	cd EncClient && $(DEBUG) encclient.EncClient
+
+debug_s: server
+	cd EncServer && $(DEBUG) encserver.EncServer
 
 clean:
 	rm -rf */build

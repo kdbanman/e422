@@ -1,8 +1,7 @@
-TODO:
-
-- pad to mod 8 == 0, min 2 longs
-- skeletalize decrypt
-- toss in encrypt and decrypt
+Kirby Banman
+ECE422
+Assignment 2
+Dec 3 2014
 
 Server Sequence:
 

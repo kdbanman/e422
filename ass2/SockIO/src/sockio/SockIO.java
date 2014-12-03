@@ -16,11 +16,14 @@ public class SockIO {
     private Socket sock;
     private InputStream is;
     private OutputStream os;
+    private boolean debug;
     
     public SockIO(Socket client) throws IOException {
         sock = client;
         is = sock.getInputStream();
         os = sock.getOutputStream();
+        
+        debug = null != System.getProperty("sockio.debug");
     }
     
     public String recvString() throws IOException {
@@ -36,21 +39,21 @@ public class SockIO {
     }
     
     public byte[] recv() throws IOException {
-        System.out.println("  --Waiting to receive...");
+        log("  --Waiting to receive...");
         byte[] lenBuf = new byte[4];
         int read = 0;
         read = is.read(lenBuf, 0, lenBuf.length);
         if (read != 4) throw new IOException("Size header could not be read.");
-        System.out.println("  --Done");
+        log("  --Done");
         
         int len = ByteBuffer.wrap(lenBuf).getInt();
         
-        System.out.println("  --Reading " + Integer.toString(len) + " byte payload...");
+        log("  --Reading " + Integer.toString(len) + " byte payload...");
         byte[] msg = new byte[len];
         is.read(msg, 0, len);
-        System.out.println("  --Done");
+        log("  --Done");
         
-        System.out.println("  --Received: " + new String(msg));
+        log("  --Received: " + new String(msg));
         
         return msg;
     }
@@ -68,15 +71,19 @@ public class SockIO {
     }
     
     public void send(byte[] bytes) throws IOException {
-        System.out.println("  --Sending length header...");
+        log("  --Sending length header...");
         byte[] len = ByteBuffer.allocate(4).putInt(bytes.length).array();
         os.write(len, 0, len.length);
         os.flush();
-        System.out.println("  --Done");
+        log("  --Done");
 
-        System.out.println("  --Sending " + Integer.toString(bytes.length) + " byte payload...");
+        log("  --Sending " + Integer.toString(bytes.length) + " byte payload...");
         os.write(bytes, 0, bytes.length);
         os.flush();
-        System.out.println("  --Done");
+        log("  --Done");
+    }
+    
+    private void log(String s) {
+        if (debug) System.out.println(s);
     }
 }
