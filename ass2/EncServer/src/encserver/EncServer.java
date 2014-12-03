@@ -1,9 +1,6 @@
 package encserver;
 
-import sockio.SockIO;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -32,26 +29,19 @@ public class EncServer {
         try {
             // bind to socket
             serverSocket = new ServerSocket(port);
-            //while (true) {
+            while (true) {
                 try {
                     System.out.println("Waiting for client on port 16000...");
                     Socket cSock = serverSocket.accept();
-                    System.out.println("Connected to " + cSock.getRemoteSocketAddress());
                     
-                    SockIO sockio = new SockIO(cSock);
-                    sockio.send("asshole".getBytes());
+                    ClientService svc = new ClientService(cSock, users);
+                    svc.start();
                     
-                    System.out.println(new String(sockio.recv()));
-
-                    cSock.close();
                 } catch (SocketTimeoutException s) {
                     System.out.println("Socket timed out!");
-                    //break;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    //break;
+                    break;
                 }
-            //}
+            }
         } catch (IOException e) {
             System.out.println("Could not bind to port 16000!");
             e.printStackTrace();

@@ -15,6 +15,7 @@ public class User {
      * @param name 
      */
     public User(String name, String key) {
+        this.name = name;
         this.key = new byte[keyLength];
         
         byte[] keyBytes = key.getBytes();

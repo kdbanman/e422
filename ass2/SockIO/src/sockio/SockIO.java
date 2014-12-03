@@ -26,8 +26,12 @@ public class SockIO {
         os = sock.getOutputStream();
     }
     
+    public String recvString() throws IOException {
+        return new String(recv());
+    }
+    
     public byte[] recv() throws IOException {
-        System.out.println("Reading length header...");
+        System.out.println("Waiting to receive...");
         byte[] lenBuf = new byte[4];
         int read = 0;
         read = is.read(lenBuf, 0, lenBuf.length);
@@ -44,6 +48,10 @@ public class SockIO {
         System.out.println("Received: " + new String(msg));
         
         return msg;
+    }
+    
+    public void send(String toSend) throws IOException {
+        send(toSend.getBytes());
     }
     
     public void send(byte[] bytes) throws IOException {

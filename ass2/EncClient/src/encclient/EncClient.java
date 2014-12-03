@@ -1,40 +1,66 @@
 package encclient;
 
-import sockio.SockIO;
 import java.io.BufferedReader;
+import sockio.SockIO;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
+import sockio.Encryptor;
 
 /**
  *
  * @author kdbanman
  */
 public class EncClient {
+    static String name;
+    static int keyLength;
+    static byte[] key;
     
-    public static void authenticate(PrintWriter out, BufferedReader in) throws IOException {
+    static byte[] getKey(String keyStr) {
+        byte[] key = new byte[keyLength];
+        
+        byte[] keyBytes = keyStr.getBytes();
+        
+        for (int i = 0; i < keyLength && i < keyStr.length(); i++) {
+            key[i] = keyBytes[i];
+        }
+        
+        return key;
+    }
+    
+    static void authenticate(SockIO sio) throws IOException {
+        // allow user input from stdin
         BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
 
-        String input = null;
-        String response = null;
+        String id = null;
+        String keyStr = null;
+        String response = "";
         while (!response.equalsIgnoreCase("access-granted")) {
+            // get user id and key from stdin
             System.out.print("User ID?  ");
-            input = userIn.readLine().trim().toLowerCase();
+            id = userIn.readLine().trim().toLowerCase();
+            System.out.print("Passkey?  ");
+            keyStr = userIn.readLine().trim().toLowerCase();
 
-            System.out.println("WHAT");
-            out.print((input + "\r\n").getBytes());
+            byte[] cipher = Encryptor.enc(id, getKey(keyStr));
             
-            System.out.println("THE HELL");
+            System.out.println("Sending " + new String(cipher) + "...");
+            sio.send(cipher);
+            System.out.println("Sent.");
             
-            response = in.readLine().trim().toLowerCase();
+            response = sio.recvString();
             
-            System.out.println(response);
         }
         System.out.println("Authenticated.");
+        
+        name = id;
+        key = getKey(keyStr);
     }
 
     public static void main(String[] args) {
+        keyLength = 32;
+        name = null;
+        
         try {
             // Connect and get I/O streams for socket
             
@@ -42,15 +68,14 @@ public class EncClient {
             Socket sock = new Socket("localhost", 16000);
             System.out.println("Connected");
 
-            SockIO sockio = new SockIO(sock);
+            SockIO sio = new SockIO(sock);
             
-            System.out.println(new String(sockio.recv()));
-            
-            sockio.send("asspiss".getBytes());
+            // block user until server authenticates
+            authenticate(sio);
             
             sock.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Socket Stream I/O Error.");
         }
     }
 }
