@@ -16,8 +16,8 @@ public class EncClient {
     public static void authenticate(PrintWriter out, BufferedReader in) throws IOException {
         BufferedReader userIn = new BufferedReader(new InputStreamReader(System.in));
 
-        String input = "";
-        String response = "";
+        String input = null;
+        String response = null;
         while (!response.equalsIgnoreCase("access-granted")) {
             System.out.print("User ID?  ");
             input = userIn.readLine().trim().toLowerCase();
