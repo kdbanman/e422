@@ -43,7 +43,7 @@ public class SockIO {
         byte[] lenBuf = new byte[4];
         int read = 0;
         read = is.read(lenBuf, 0, lenBuf.length);
-        if (read != 4) throw new IOException("Size header could not be read.");
+        if (read != 4) throw new IOException("Client hung up unexpectedly.");
         log("  --Done");
         
         int len = ByteBuffer.wrap(lenBuf).getInt();
