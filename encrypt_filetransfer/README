@@ -1,7 +1,6 @@
 Kirby Banman
-ECE422
-Assignment 2
 Dec 3 2014
+An client and server for encrypted network file transfer.
 
 Server Sequence:
 
